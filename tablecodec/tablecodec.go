@@ -14,10 +14,13 @@
 package tablecodec
 
 import (
+	"reflect"
 	"bytes"
 	"encoding/binary"
 	"math"
 	"time"
+	"reflect"
+
 
 	"github.com/pingcap/errors"
 	"github.com/pingcap/tidb/kv"
@@ -72,6 +75,18 @@ func EncodeRowKeyWithHandle(tableID int64, handle int64) kv.Key {
 // DecodeRecordKey decodes the key and gets the tableID, handle.
 func DecodeRecordKey(key kv.Key) (tableID int64, handle int64, err error) {
 	/* Your code here */
+	// type check
+	k := key
+	kType := reflect.TypeOf(k)
+	if kType.Kind()==kv.Key {
+		tableID = k[1:9]
+		handle = k[11:]
+		err = nil
+	} else {
+		tableID = nil
+		handle = nil
+		err = errors.New("invalid key type!")
+	}
 	return
 }
 
